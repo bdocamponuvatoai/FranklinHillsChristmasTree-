@@ -1,0 +1,452 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────  Design tokens  ───────────────────────────── */
+
+@theme {
+  --color-paper: #f5f2e9;
+  --color-paper-deep: #ebe7da;
+  --color-sage: #e6e9de;
+  --color-sage-deep: #d4dacb;
+  --color-pine: #15392e;
+  --color-pine-deep: #0b231c;
+  --color-ink: #173c31;
+  --color-moss: #55635b;
+  --color-line: #d3d8cb;
+  --color-berry: #742b38;
+  --color-berry-deep: #5a1f2a;
+  --color-frost: #d3dfc5;
+  --color-glow: #f6dca2;
+  --color-ember: #bd7950;
+
+  /* Fluid type scale — size, leading and tracking travel together. */
+  --text-hero: clamp(3.1rem, 10.4vw, 9.25rem);
+  --text-hero--line-height: 0.92;
+  --text-hero--letter-spacing: -0.032em;
+  --text-display: clamp(2.6rem, 6.4vw, 5.75rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.028em;
+  --text-statement: clamp(1.85rem, 4.4vw, 4.1rem);
+  --text-statement--line-height: 1.1;
+  --text-statement--letter-spacing: -0.022em;
+  --text-title: clamp(1.75rem, 3.2vw, 2.85rem);
+  --text-title--line-height: 1.06;
+  --text-title--letter-spacing: -0.03em;
+  --text-wordmark: clamp(3.5rem, 15.2vw, 15rem);
+  --text-wordmark--line-height: 0.85;
+  --text-wordmark--letter-spacing: -0.04em;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --animate-rise: rise 1.15s var(--ease-out-expo) both;
+  --animate-fade-up: fade-up 1s var(--ease-out-expo) both;
+  --animate-settle: settle 2.2s var(--ease-out-expo) both;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-twinkle: twinkle 2.6s ease-in-out infinite alternate;
+  --animate-beacon: beacon 2.4s ease-out infinite;
+
+  @keyframes rise {
+    from {
+      transform: translate3d(0, 108%, 0) rotate(2deg);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.25rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes settle {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  @keyframes twinkle {
+    from {
+      opacity: 0.35;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes beacon {
+    0% {
+      box-shadow: 0 0 0 0 rgb(246 220 162 / 0.7);
+    }
+    80%,
+    100% {
+      box-shadow: 0 0 0 0.6rem rgb(246 220 162 / 0);
+    }
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+/* ─────────────────────────────  Base  ───────────────────────────── */
+
+@layer base {
+  :root {
+    color-scheme: light;
+    interpolate-size: allow-keywords;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-pine);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 3px;
+  }
+
+  summary {
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────  Utilities  ───────────────────────────── */
+
+@utility shell {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4.5vw, 3.5rem);
+}
+
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@utility font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "SOFT" 40;
+  font-weight: 350;
+}
+
+/* Clips a line of display type so its child can rise into view. */
+@utility line-mask {
+  display: block;
+  overflow: clip;
+  padding-block-end: 0.09em;
+  padding-inline-end: 0.12em;
+  margin-block-end: -0.09em;
+}
+
+/* ─────────────────────────────  Components  ───────────────────────────── */
+
+@layer components {
+  /* Range slider — large touch target with a filled track (--fill: 0–100%). */
+  .range {
+    --fill: 50%;
+    appearance: none;
+    width: 100%;
+    height: 2.75rem;
+    background: transparent;
+    cursor: pointer;
+    touch-action: pan-y;
+  }
+  .range:focus-visible {
+    outline: none;
+  }
+  .range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--color-pine) var(--fill),
+      var(--color-sage-deep) var(--fill)
+    );
+  }
+  .range::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-sage-deep);
+  }
+  .range::-moz-range-progress {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-pine);
+  }
+  .range::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.625rem;
+    height: 1.625rem;
+    margin-top: calc(2px - 0.8125rem);
+    border: 2px solid var(--color-pine);
+    border-radius: 50%;
+    background: var(--color-paper);
+    box-shadow: 0 4px 14px rgb(11 35 28 / 0.18);
+    transition: transform 0.25s var(--ease-spring);
+  }
+  .range::-moz-range-thumb {
+    width: 1.375rem;
+    height: 1.375rem;
+    border: 2px solid var(--color-pine);
+    border-radius: 50%;
+    background: var(--color-paper);
+    box-shadow: 0 4px 14px rgb(11 35 28 / 0.18);
+    transition: transform 0.25s var(--ease-spring);
+  }
+  .range:active::-webkit-slider-thumb {
+    transform: scale(1.18);
+  }
+  .range:active::-moz-range-thumb {
+    transform: scale(1.18);
+  }
+  .range:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 3px;
+  }
+  .range:focus-visible::-moz-range-thumb {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 3px;
+  }
+
+  /* Accordion — animates open/closed where ::details-content is supported. */
+  .disclosure::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size 0.55s var(--ease-out-expo),
+      content-visibility 0.55s allow-discrete;
+  }
+  .disclosure[open]::details-content {
+    block-size: auto;
+  }
+
+  /* Full-screen mobile menu built on the native <dialog>. */
+  .menu-sheet {
+    opacity: 0;
+    transform: translateY(-1.5rem);
+    transition:
+      opacity 0.45s var(--ease-out-expo),
+      transform 0.6s var(--ease-out-expo),
+      overlay 0.45s allow-discrete,
+      display 0.45s allow-discrete;
+  }
+  .menu-sheet[open] {
+    opacity: 1;
+    transform: none;
+  }
+  @starting-style {
+    .menu-sheet[open] {
+      opacity: 0;
+      transform: translateY(-1.5rem);
+    }
+  }
+  .menu-sheet::backdrop {
+    background: transparent;
+  }
+  .menu-sheet[open] .menu-item {
+    animation: var(--animate-fade-up);
+    animation-delay: calc(var(--i, 0) * 60ms + 120ms);
+  }
+
+  /* Scene autoplay progress — CSS owns the timing; JS listens for animationend. */
+  .scene-progress {
+    transform-origin: left;
+    animation: scene-progress var(--duration, 7s) linear forwards;
+    animation-play-state: paused;
+  }
+  [data-autoplay="true"] .scene-progress {
+    animation-play-state: running;
+  }
+  @media (hover: hover) {
+    [data-autoplay="true"]:hover .scene-progress {
+      animation-play-state: paused;
+    }
+  }
+  @keyframes scene-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* ─────────────────────────────  Motion  ─────────────────────────────
+ * Everything below is progressive enhancement: content is fully visible when
+ * animations or scroll timelines are unsupported, and nothing moves for
+ * visitors who prefer reduced motion.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-line {
+    display: block;
+    animation: var(--animate-rise);
+    animation-delay: calc(var(--i, 0) * 110ms + 150ms);
+  }
+  .hero-media {
+    animation: var(--animate-settle);
+  }
+  .enter {
+    animation: var(--animate-fade-up);
+    animation-delay: calc(var(--i, 0) * 90ms + 450ms);
+  }
+
+  @supports (animation-timeline: view()) {
+    /* Section content drifts up as it enters the viewport. */
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+
+    /* Media slowly travels inside its frame while scrolling past. */
+    .parallax {
+      animation: parallax linear both;
+      animation-timeline: view();
+      animation-range: cover;
+      scale: 1.12;
+    }
+
+    /* Hero image eases away as the visitor scrolls into the story. */
+    .hero-drift {
+      animation: hero-drift linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+
+    /* Each word of the statement fills with ink as it crosses the viewport. */
+    .ink-word {
+      animation: ink linear both;
+      animation-timeline: view();
+      animation-range: entry 25% cover 45%;
+    }
+
+    /* Figures unveil from the bottom edge. */
+    .unveil {
+      animation: unveil linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    .scroll-progress {
+      display: block;
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 3rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes parallax {
+  from {
+    transform: translate3d(0, -6%, 0);
+  }
+  to {
+    transform: translate3d(0, 6%, 0);
+  }
+}
+@keyframes hero-drift {
+  to {
+    transform: translate3d(0, 14%, 0) scale(1.06);
+  }
+}
+@keyframes ink {
+  from {
+    opacity: 0.18;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes unveil {
+  from {
+    clip-path: inset(18% 0 0 0 round 1.5rem);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 1.5rem);
+  }
+}
+@keyframes scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scene-progress {
+    display: none;
+  }
+}
