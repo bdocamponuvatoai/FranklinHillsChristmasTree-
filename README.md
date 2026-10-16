@@ -24,7 +24,7 @@ npm run dev          # http://localhost:3000
 | `npm test`       | Unit tests (Vitest) for the tree-height planner |
 | `npm run format` | Format with Prettier (sorts Tailwind classes)   |
 
-Requires Node.js 20.9 or newer.
+Requires Node.js 22.12+ or 24+ (24 recommended; see [`.nvmrc`](.nvmrc)).
 
 ## Editing content
 
@@ -60,7 +60,7 @@ facts on the site.
 src/
   app/                 Routes, root layout, metadata files (icons, OG image, robots, sitemap,
                        manifest, llms.txt) and the global design system (globals.css)
-  assets/images/       Source photography (served as responsive AVIF/WebP by next/image)
+  assets/images/       AI-generated source images (served as responsive AVIF/WebP by next/image)
   components/
     layout/            Announcement bar, header, scroll-spy nav, mobile menu, mobile dock, footer
     sections/          One file per homepage section
@@ -98,14 +98,14 @@ Work on a branch and open a pull request into `main`. Use
 [Conventional Commits](https://www.conventionalcommits.org/) for messages (`feat:`, `fix:`,
 `chore:`, `ci:`, `docs:`).
 
-GitHub Actions runs on every push and pull request:
+GitHub Actions runs on pushes to `main` and on pull requests (CI can also be started by hand). CodeQL also runs weekly, and Dependabot opens update PRs weekly:
 
-| Workflow                               | What it does                                                                                  |
-| -------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [CI](.github/workflows/ci.yml)         | `npm ci`, typecheck, lint, format check, unit tests, production build, production `npm audit` |
-| Dependency review (in CI)              | Blocks pull requests that add dependencies with high-severity advisories                      |
-| [CodeQL](.github/workflows/codeql.yml) | Static security analysis of TypeScript and the workflow files, on PRs, `main` and weekly      |
-| [Dependabot](.github/dependabot.yml)   | Weekly grouped update PRs for npm packages and GitHub Actions                                 |
+| Workflow                               | What it does                                                                                                   |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| [CI](.github/workflows/ci.yml)         | `npm ci`, typecheck, lint, format check, unit tests, production build, production `npm audit`                  |
+| Dependency review (in CI)              | Blocks pull requests that add dependencies with high-severity advisories                                       |
+| [CodeQL](.github/workflows/codeql.yml) | Static security analysis of TypeScript and the workflow files, on PRs into `main`, pushes to `main` and weekly |
+| [Dependabot](.github/dependabot.yml)   | Weekly grouped update PRs for npm packages and GitHub Actions                                                  |
 
 Actions are pinned to full commit SHAs, and Dependabot keeps them current. Workflows run with
 read-only tokens by default. The Node.js version for CI comes from [`.nvmrc`](.nvmrc).
