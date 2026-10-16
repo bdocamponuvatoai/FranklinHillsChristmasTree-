@@ -9,7 +9,7 @@
     "url": "git+https://github.com/bdocamponuvatoai/FranklinHillsChristmasTree-.git"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": "^22.12.0 || >=24.0.0"
   },
   "packageManager": "npm@11.12.1",
   "scripts": {
@@ -17,7 +17,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
