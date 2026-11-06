@@ -82,10 +82,20 @@ export function Hero() {
               here.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="#moments" variant="ivory" icon={<ArrowDown />}>
-                Step into the season
+              <ButtonLink
+                href="#trees"
+                variant="ivory"
+                icon={<ArrowDown />}
+                className="w-full sm:w-auto"
+              >
+                Browse the tree collection
               </ButtonLink>
-              <ButtonLink href={business.phone.href} variant="glass" icon={<Phone />}>
+              <ButtonLink
+                href={business.phone.href}
+                variant="glass"
+                icon={<Phone />}
+                className="w-full sm:w-auto"
+              >
                 Call {business.owner}
               </ButtonLink>
             </div>

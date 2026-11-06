@@ -1,6 +1,8 @@
 import { MobileDock } from "@/components/layout/mobile-dock";
 import { Decorations } from "@/components/sections/decorations";
+import { Delivery } from "@/components/sections/delivery";
 import { Faq } from "@/components/sections/faq";
+import { Gallery } from "@/components/sections/gallery";
 import { Hero } from "@/components/sections/hero";
 import { Interlude } from "@/components/sections/interlude";
 import { Marquee } from "@/components/sections/marquee";
@@ -8,6 +10,8 @@ import { Moments } from "@/components/sections/moments";
 import { PlannerSection } from "@/components/sections/planner-section";
 import { Statement } from "@/components/sections/statement";
 import { Tradition } from "@/components/sections/tradition";
+import { TreeCatalog } from "@/components/sections/tree-catalog";
+import { TreeStands } from "@/components/sections/tree-stands";
 import { Visit } from "@/components/sections/visit";
 import { business, faqs } from "@/content/site";
 import { siteUrl } from "@/lib/site-config";
@@ -51,6 +55,10 @@ export default function HomePage() {
       />
       <Hero />
       <Marquee />
+      <TreeCatalog />
+      <TreeStands />
+      <Delivery />
+      <Gallery />
       <Moments />
       <Statement />
       <Tradition />

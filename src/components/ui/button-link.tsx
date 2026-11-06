@@ -22,7 +22,8 @@ type ButtonLinkProps = Omit<ComponentProps<"a">, "children"> & {
 
 /**
  * Pill-shaped call to action with a circular icon chip. Renders a plain anchor
- * because every CTA on this site is an in-page anchor or a `tel:` link.
+ * because every CTA on this site is an in-page anchor, a `tel:` link or an
+ * external link.
  */
 export function ButtonLink({
   children,

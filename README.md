@@ -32,14 +32,15 @@ Requires Node.js 22.12+ or 24+ (24 recommended; see [`.nvmrc`](.nvmrc)).
 JSON-LD structured data, metadata and `/llms.txt` are all generated from it, so they can't drift
 apart.
 
-Season dates, hours, address, pricing, varieties, reservations and delivery are **unconfirmed**.
-Keep them out of the site until the owner confirms them. Never infer them from the business name or
-from the imagery. Once confirmed, remove the item from `unconfirmedDetails` and add the fact
-(and update the FAQ answers).
+Season dates, hours, address, pricing, varieties, stand inventory, reservations and delivery are
+**unconfirmed**. They may appear only as clearly labeled placeholders or proposed information;
+never present them as business facts or infer them from the imagery. Once confirmed, remove the
+item from `unconfirmedDetails`, update the matching catalog or service record, and revise the FAQ.
 
-Imagery in `src/assets/images` is AI-generated seasonal inspiration, not photos of the lot or
-stock. The disclaimer is shown on the site; keep it while those images are in use. The prompts are
-in [`docs/asset-prompts.md`](docs/asset-prompts.md).
+Imagery in `src/assets/images` is AI-generated seasonal inspiration and product scaffolding, not
+photos of the lot, inventory, customers, or delivery fleet. The disclaimer is shown on the site;
+keep it while those images are in use. The prompts are in
+[`docs/asset-prompts.md`](docs/asset-prompts.md).
 
 ## Configuration
 
@@ -73,13 +74,16 @@ src/
 ## Design and engineering notes
 
 - **Server Components by default.** Only the interactive pieces are client components: the scene
-  showcase, tree planner, mobile menu, scroll-spy nav and mobile dock.
+  showcase, tree planner, tree catalog filters, gallery lightbox, inquiry form, mobile menu,
+  scroll-spy nav and mobile dock.
 - **No animation library.** Entrances, parallax, word-by-word ink fill, reading progress and the
   scene autoplay timer all use CSS (including scroll-driven animations). Everything is visible when
   a browser lacks support, and nothing moves for visitors who prefer reduced motion.
-- **Works without JavaScript:** anchor navigation, FAQ accordion (native `<details name>`), calls.
-- **Accessibility:** skip link, landmarks, native `<dialog>` menu (focus trap, Escape, inert
-  page), ARIA tablist with arrow/Home/End keys, a pausable autoplay that stops on interaction,
+- **Works without JavaScript:** anchor navigation, FAQ accordion (native `<details name>`), calls,
+  and the full tree catalog (unfiltered). The inquiry form needs JavaScript to build its
+  pre-filled text message (`sms:` link); nothing is sent to or stored by the site.
+- **Accessibility:** skip link, landmarks, native `<dialog>` menu and gallery lightbox (focus trap,
+  Escape, inert page), ARIA tablist with arrow/Home/End keys, a pausable autoplay that stops on interaction,
   debounced screen-reader announcements for the planner, 44px+ touch targets. Audited with axe-core
   at 1440px and 390px with zero violations.
 - **Security headers** are set in [`next.config.ts`](next.config.ts): CSP locked to `'self'`, HSTS,
