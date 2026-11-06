@@ -48,10 +48,10 @@ export function MobileDock() {
           <Phone /> Call {business.owner}
         </a>
         <a
-          href="#planner"
+          href="#trees"
           className="flex min-h-12 flex-1 items-center justify-center rounded-full text-sm font-medium"
         >
-          Plan my tree
+          Browse trees
         </a>
       </div>
     </div>

@@ -46,6 +46,20 @@ export const Phone = (props: IconProps) => (
   </Icon>
 );
 
+export const Message = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M5 5.5h14v10H9l-4 3v-13Z" />
+    <path d="M8 9h8M8 12h5" />
+  </Icon>
+);
+
+export const MapPin = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" />
+    <circle cx="12" cy="10" r="2" />
+  </Icon>
+);
+
 export const Plus = (props: IconProps) => (
   <Icon {...props}>
     <path d="M12 5v14M5 12h14" />

@@ -9,7 +9,7 @@ import { SectionNav } from "./section-nav";
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line/70 bg-paper/85 backdrop-blur-xl backdrop-saturate-150">
-      <div className="shell flex h-18 items-center justify-between gap-6 lg:h-20">
+      <div className="shell flex h-18 items-center justify-between gap-2 sm:gap-6 lg:h-20">
         <Brand />
         <SectionNav />
         <div className="flex items-center gap-2">

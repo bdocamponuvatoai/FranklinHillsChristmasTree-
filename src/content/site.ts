@@ -7,9 +7,15 @@
  */
 import type { StaticImageData } from "next/image";
 
+import deliveryImage from "@/assets/images/delivery.webp";
 import detailImage from "@/assets/images/detail.webp";
 import heroImage from "@/assets/images/hero.webp";
 import homeImage from "@/assets/images/home.webp";
+import treeSeasonal01Image from "@/assets/images/tree-seasonal-01.webp";
+import treeSeasonal02Image from "@/assets/images/tree-seasonal-02.webp";
+import treeSeasonal03Image from "@/assets/images/tree-seasonal-03.webp";
+import treeSelectionImage from "@/assets/images/tree-selection.webp";
+import treeStandsImage from "@/assets/images/tree-stands.webp";
 
 export const business = {
   name: "Franklin Hills Christmas Tree Lot",
@@ -34,8 +40,16 @@ export const unconfirmedDetails = [
   "Lot address",
   "Tree sizes & varieties",
   "Pricing",
+  "Stand inventory",
   "Reservations & delivery",
 ] as const;
+
+export const proposedLocation = {
+  address: "1256 S Glendale Ave, Glendale, CA 91205",
+  status: "Pending client confirmation",
+  directionsUrl:
+    "https://www.google.com/maps/search/?api=1&query=1256%20S%20Glendale%20Ave%2C%20Glendale%2C%20CA%2091205",
+} as const;
 
 export const imageDisclaimer =
   "Imagery is AI-created seasonal inspiration — not photos of the actual lot or current stock.";
@@ -43,10 +57,10 @@ export const imageDisclaimer =
 export type NavItem = { href: `#${string}`; label: string; index: string };
 
 export const navigation: readonly NavItem[] = [
-  { href: "#moments", label: "The season", index: "01" },
-  { href: "#tradition", label: "The tradition", index: "02" },
-  { href: "#planner", label: "Tree planner", index: "03" },
-  { href: "#visit", label: "Plan your visit", index: "04" },
+  { href: "#trees", label: "Trees", index: "01" },
+  { href: "#stands", label: "Stands & delivery", index: "02" },
+  { href: "#gallery", label: "Gallery", index: "03" },
+  { href: "#visit", label: "Visit", index: "04" },
 ];
 
 export type SiteImage = { src: StaticImageData; alt: string };
@@ -64,7 +78,142 @@ export const images = {
     src: detailImage,
     alt: "Holiday inspiration: hands tying a cranberry ribbon on an evergreen wreath",
   },
+  selection: {
+    src: treeSelectionImage,
+    alt: "Illustrative selection of three fresh Christmas tree profiles at a seasonal lot",
+  },
+  seasonal01: {
+    src: treeSeasonal01Image,
+    alt: "Illustrative single fresh Christmas tree with a naturally airy, open branch profile",
+  },
+  seasonal02: {
+    src: treeSeasonal02Image,
+    alt: "Illustrative single fresh Christmas tree with a classic balanced conical profile",
+  },
+  seasonal03: {
+    src: treeSeasonal03Image,
+    alt: "Illustrative single fresh Christmas tree with a lush dense blue-green profile",
+  },
+  stands: {
+    src: treeStandsImage,
+    alt: "Illustrative comparison of wooden, metal, and bowl-style Christmas tree stands",
+  },
+  delivery: {
+    src: deliveryImage,
+    alt: "Illustrative bundled Christmas tree secured in a dark green pickup truck",
+  },
 } satisfies Record<string, SiteImage>;
+
+export type TreeProduct = {
+  id: string;
+  name: string;
+  profile: string;
+  variety: string;
+  sizes: string;
+  price: string;
+  availability: string;
+  description: string;
+  image: SiteImage;
+  filters: { type: "pending"; size: "pending"; price: "pending" };
+};
+
+/**
+ * Catalog scaffolding only. Replace these records when the owner confirms
+ * varieties, measurements, prices, and live availability.
+ */
+export const treeProducts: readonly TreeProduct[] = [
+  {
+    id: "tree-01",
+    name: "Seasonal tree 01",
+    profile: "Airy profile · illustrative",
+    variety: "Variety pending",
+    sizes: "Sizes pending",
+    price: "Price pending",
+    availability: "Call to confirm",
+    description:
+      "A visual placeholder for a more open branch profile. Final variety and product details require owner approval.",
+    image: images.seasonal01,
+    filters: { type: "pending", size: "pending", price: "pending" },
+  },
+  {
+    id: "tree-02",
+    name: "Seasonal tree 02",
+    profile: "Classic profile · illustrative",
+    variety: "Variety pending",
+    sizes: "Sizes pending",
+    price: "Price pending",
+    availability: "Call to confirm",
+    description:
+      "A visual placeholder for a classic full shape. Replace this copy with confirmed variety and care information.",
+    image: images.seasonal02,
+    filters: { type: "pending", size: "pending", price: "pending" },
+  },
+  {
+    id: "tree-03",
+    name: "Seasonal tree 03",
+    profile: "Dense profile · illustrative",
+    variety: "Variety pending",
+    sizes: "Sizes pending",
+    price: "Price pending",
+    availability: "Call to confirm",
+    description:
+      "A visual placeholder for a dense branch profile. Current stock, dimensions, and pricing are not yet published.",
+    image: images.seasonal03,
+    filters: { type: "pending", size: "pending", price: "pending" },
+  },
+];
+
+export const treeFilters = {
+  type: [{ value: "pending", label: "Variety to be confirmed" }],
+  size: [{ value: "pending", label: "Size to be confirmed" }],
+  price: [{ value: "pending", label: "Price to be confirmed" }],
+} as const;
+
+export const standProducts = [
+  {
+    id: "wooden",
+    name: "Wooden stand",
+    index: "01",
+    description: "Natural cross-brace style listing prepared for confirmed product details.",
+    compatibility: "Compatibility pending",
+    price: "Price pending",
+    availability: "Inventory pending",
+  },
+  {
+    id: "metal",
+    name: "Metal stand",
+    index: "02",
+    description: "Powder-coated frame style listing prepared for confirmed product details.",
+    compatibility: "Compatibility pending",
+    price: "Price pending",
+    availability: "Inventory pending",
+  },
+  {
+    id: "bowl",
+    name: "Bowl-style stand",
+    index: "03",
+    description: "Reservoir-style listing prepared for confirmed capacity and care details.",
+    compatibility: "Compatibility pending",
+    price: "Price pending",
+    availability: "Inventory pending",
+  },
+] as const;
+
+export const deliveryDetails = [
+  { label: "Availability", value: "Pending confirmation" },
+  { label: "Service areas", value: "Pending confirmation" },
+  { label: "Delivery charge", value: "Pending confirmation" },
+  { label: "Mileage fees", value: "No calculation published" },
+] as const;
+
+export const galleryImages: readonly (SiteImage & { title: string; category: string })[] = [
+  { ...images.hero, title: "An evening at the lot", category: "Tree lot" },
+  { ...images.selection, title: "Finding your profile", category: "Trees" },
+  { ...images.stands, title: "A steady foundation", category: "Stands" },
+  { ...images.delivery, title: "The journey home", category: "Delivery" },
+  { ...images.home, title: "The feeling of home", category: "Seasonal display" },
+  { ...images.detail, title: "The finishing touch", category: "Decorations" },
+];
 
 export type Scene = {
   id: string;
@@ -146,7 +295,11 @@ export const faqs = [
     answer: `Yes. ${business.name} specializes in fresh Christmas trees and holiday-related decorations. Ask ${business.owner} about this season’s specific items and prices.`,
   },
   {
+    question: "Are tree stands available?",
+    answer: `The catalog is prepared for wooden, metal, and bowl-style stands, but this season’s products, compatibility, prices, and availability are not yet confirmed. Call ${business.owner} before relying on a specific option.`,
+  },
+  {
     question: "Can I reserve a tree or arrange delivery?",
-    answer: `Reservations, delivery, and other services are not confirmed on this website. Please call ${business.owner} to discuss your needs before making plans.`,
+    answer: `Reservations, delivery areas, charges, mileage rules, and other services are not confirmed on this website. Please call ${business.owner} to discuss your needs before making plans.`,
   },
 ] as const;

@@ -9,8 +9,10 @@ export function AnnouncementBar() {
           className="size-1.5 shrink-0 animate-beacon rounded-full bg-glow"
         />
         <span>
-          <span className="hidden sm:inline">A little Christmas starts here · </span>
-          Call for this season’s dates &amp; availability
+          <span className="sm:hidden">Call for dates &amp; availability</span>
+          <span className="hidden sm:inline">
+            A little Christmas starts here · Call for this season’s dates &amp; availability
+          </span>
         </span>
         <a
           href={business.phone.href}

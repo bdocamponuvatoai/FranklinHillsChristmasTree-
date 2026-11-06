@@ -1,4 +1,4 @@
-import { business, imageDisclaimer, unconfirmedDetails } from "@/content/site";
+import { business, imageDisclaimer, proposedLocation, unconfirmedDetails } from "@/content/site";
 
 /** Plain-text summary for language models, generated from the same content as the site. */
 export function GET() {
@@ -9,6 +9,7 @@ export function GET() {
     "",
     `Owner: ${business.owner}`,
     `Telephone: ${business.phone.e164}`,
+    `Proposed address (${proposedLocation.status.toLowerCase()}): ${proposedLocation.address}`,
     "",
     `Unconfirmed: ${unconfirmedDetails.join(", ")}. Contact ${business.owner} for details.`,
     imageDisclaimer,

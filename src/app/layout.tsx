@@ -25,7 +25,7 @@ const geist = Geist({
 });
 
 const title = `${business.name} | Bring Christmas Home`;
-const description = `Fresh Christmas trees and holiday decorations from ${business.name}. Contact owner ${business.owner} at ${business.phone.display} for seasonal details.`;
+const description = `Explore Christmas tree profiles, stand styles, planning guidance, and seasonal inspiration from ${business.name}. Contact owner ${business.owner} at ${business.phone.display} for confirmed inventory and visit details.`;
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
