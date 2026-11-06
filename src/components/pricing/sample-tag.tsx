@@ -1,9 +1,11 @@
-import { pricing } from "@/content/site";
+import type { ReactNode } from "react";
+
+import { isSampleCatalog } from "@/content/site";
 import { cn } from "@/lib/cn";
 
-/** Marks a price as a sample rate. Renders nothing once `pricing.status` is "confirmed". */
+/** Marks a detail as sample content. Renders nothing once the catalog is confirmed. */
 export function SampleTag({ className }: { className?: string }) {
-  if (pricing.status !== "sample") return null;
+  if (!isSampleCatalog) return null;
   return (
     <span
       className={cn(
@@ -13,5 +15,15 @@ export function SampleTag({ className }: { className?: string }) {
     >
       Sample
     </span>
+  );
+}
+
+/** Banner explaining that a section shows sample content; hidden once confirmed. */
+export function SampleNotice({ title, children }: { title: string; children: ReactNode }) {
+  if (!isSampleCatalog) return null;
+  return (
+    <p className="border-l-2 border-berry bg-sage px-5 py-4 text-sm leading-relaxed">
+      <strong className="font-medium">{title}</strong> {children}
+    </p>
   );
 }

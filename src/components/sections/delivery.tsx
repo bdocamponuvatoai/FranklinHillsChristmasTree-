@@ -8,6 +8,7 @@ import { ButtonLink } from "../ui/button-link";
 import { Eyebrow } from "../ui/eyebrow";
 import { Phone } from "../ui/icons";
 import { TextLink } from "../ui/text-link";
+import { InquiryButton } from "./inquiry-form";
 
 const { baseFee, includedMiles, perMile, maxMiles } = pricing.delivery;
 
@@ -33,24 +34,15 @@ export function Delivery() {
             Delivery details, <em className="text-berry">clearly stated.</em>
           </h2>
           <p className="mt-7 max-w-md text-[0.9375rem] leading-relaxed text-moss">
-            Delivery has not been confirmed for this season. The fees below show how delivery
-            pricing works: a base fee, then a charge for each extra mile.
+            Your tree, delivered to your door. A base fee covers homes near the lot, and each extra
+            mile adds a small charge, so you know the cost before you ask.
           </p>
 
           <dl className="mt-9 border-t border-line">
-            {deliveryDetails.map((detail) => (
+            {[...deliveryDetails, ...feeDetails].map((detail) => (
               <div
                 key={detail.label}
-                className="grid grid-cols-2 gap-5 border-b border-line py-4 text-sm"
-              >
-                <dt className="text-moss">{detail.label}</dt>
-                <dd className="text-right font-medium">{detail.value}</dd>
-              </div>
-            ))}
-            {feeDetails.map((detail) => (
-              <div
-                key={detail.label}
-                className="grid grid-cols-2 gap-5 border-b border-line py-4 text-sm"
+                className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-5 border-b border-line py-4 text-sm"
               >
                 <dt className="text-moss">{detail.label}</dt>
                 <dd className="text-right font-medium">
@@ -62,9 +54,9 @@ export function Delivery() {
           </dl>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="#inquiry" variant="berry">
+            <InquiryButton interest="Delivery information" variant="berry">
               Prepare a delivery inquiry
-            </ButtonLink>
+            </InquiryButton>
             <ButtonLink href={business.phone.href} icon={<Phone />}>
               Call {business.owner}
             </ButtonLink>

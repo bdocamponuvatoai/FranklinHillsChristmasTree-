@@ -1,8 +1,9 @@
 import { business, pricing, standProducts, treeProducts } from "@/content/site";
+import { rangesOverlap } from "@/lib/catalog";
 import { formatPrice, treePrice } from "@/lib/pricing";
 
 import { PriceEstimator } from "../pricing/price-estimator";
-import { SampleTag } from "../pricing/sample-tag";
+import { SampleNotice, SampleTag } from "../pricing/sample-tag";
 import { Eyebrow } from "../ui/eyebrow";
 
 const { delivery, heights, roundTo } = pricing;
@@ -16,8 +17,8 @@ const priceHeights = Array.from(
 const rules = [
   {
     title: "Trees are priced by height",
-    body: `Each tree profile has a rate per foot: ${treeProducts
-      .map((product) => `${product.shape} ${formatPrice(product.ratePerFoot)}`)
+    body: `Each variety has a rate per foot: ${treeProducts
+      .map((product) => `${product.name} ${formatPrice(product.ratePerFoot)}`)
       .join(", ")}. Height × rate, rounded to the nearest ${formatPrice(roundTo)}.`,
   },
   {
@@ -34,8 +35,9 @@ const rules = [
 
 export function PricingSection() {
   return (
-    <section id="pricing" aria-labelledby="pricing-title" className="shell py-20 sm:py-28 lg:py-36">
-      <div className="reveal grid gap-7 md:grid-cols-12 md:items-end">
+    // No top padding: the rule below separates this from the delivery section above.
+    <section id="pricing" aria-labelledby="pricing-title" className="shell pb-20 sm:pb-28 lg:pb-36">
+      <div className="reveal grid gap-7 border-t border-line pt-14 sm:pt-20 md:grid-cols-12 md:items-end">
         <div className="md:col-span-8">
           <Eyebrow className="mb-6 text-moss">How pricing works</Eyebrow>
           <h2 id="pricing-title" className="font-display text-display">
@@ -48,13 +50,12 @@ export function PricingSection() {
         </p>
       </div>
 
-      {pricing.status === "sample" && (
-        <p className="mt-10 border-l-2 border-berry bg-sage px-5 py-4 text-sm leading-relaxed sm:mt-12">
-          <strong className="font-medium">Sample pricing for owner review.</strong> These rates show
-          how pricing works. They are not this season’s prices, and {business.owner} confirms every
-          price.
-        </p>
-      )}
+      <div className="mt-10 sm:mt-12">
+        <SampleNotice title="Sample pricing for owner review.">
+          These rates show how pricing works. They are not this season’s prices, and{" "}
+          {business.owner} confirms every price.
+        </SampleNotice>
+      </div>
 
       <ol className="mt-12 grid gap-10 sm:mt-16 md:grid-cols-3 md:gap-8">
         {rules.map((rule, index) => (
@@ -78,7 +79,9 @@ export function PricingSection() {
           <SampleTag className="text-berry" />
         </h3>
         <table className="mt-6 w-full border-collapse text-sm">
-          <caption className="sr-only">Tree price for each height and tree profile</caption>
+          <caption className="sr-only">
+            Tree price for each height and variety. A dash means that height isn’t offered.
+          </caption>
           <thead>
             <tr className="border-b border-line">
               <th scope="col" className="py-3 pr-4 text-left font-medium text-moss">
@@ -86,7 +89,7 @@ export function PricingSection() {
               </th>
               {treeProducts.map((product) => (
                 <th key={product.id} scope="col" className="py-3 pl-4 text-right font-medium">
-                  {product.shape}
+                  {product.name}
                   <span className="block text-xs font-normal text-moss">
                     {formatPrice(product.ratePerFoot)} per ft
                   </span>
@@ -100,11 +103,18 @@ export function PricingSection() {
                 <th scope="row" className="py-3 pr-4 text-left font-normal text-moss">
                   {height} ft
                 </th>
-                {treeProducts.map((product) => (
-                  <td key={product.id} className="py-3 pl-4 text-right tabular-nums">
-                    {formatPrice(treePrice(height, product.ratePerFoot, roundTo))}
-                  </td>
-                ))}
+                {treeProducts.map((product) =>
+                  rangesOverlap(product.sizes, { min: height, max: height }) ? (
+                    <td key={product.id} className="py-3 pl-4 text-right tabular-nums">
+                      {formatPrice(treePrice(height, product.ratePerFoot, roundTo))}
+                    </td>
+                  ) : (
+                    <td key={product.id} className="py-3 pl-4 text-right text-moss">
+                      <span aria-hidden="true">–</span>
+                      <span className="sr-only">Not offered</span>
+                    </td>
+                  ),
+                )}
               </tr>
             ))}
           </tbody>

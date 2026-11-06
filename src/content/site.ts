@@ -7,6 +7,7 @@
  */
 import type { StaticImageData } from "next/image";
 
+import { formatHeightRange, type HeightRange } from "@/lib/catalog";
 import type { PricingRules } from "@/lib/pricing";
 
 import deliveryImage from "@/assets/images/delivery.webp";
@@ -53,22 +54,34 @@ export const proposedLocation = {
     "https://www.google.com/maps/search/?api=1&query=1256%20S%20Glendale%20Ave%2C%20Glendale%2C%20CA%2091205",
 } as const;
 
-export type PricingStatus = "sample" | "confirmed";
+/** Proposed season and hours, shown as proposed until the owner confirms them. */
+export const proposedHours = {
+  status: "Proposed · pending client confirmation",
+  season: "Fri, Nov 27 – Thu, Dec 24",
+  daily: "Daily, 9 am – 9 pm",
+} as const;
+
+export type CatalogStatus = "sample" | "confirmed";
 
 /**
- * Rules behind every price on the site: tree rates per foot (on each tree
- * product), flat stand prices (on each stand) and the delivery fee below.
- *
- * While `status` is "sample", every price carries a "Sample" label: these rates
- * show the owner how pricing works and are not this season's prices. Once the
- * owner confirms real rates, update the numbers, set `status` to "confirmed",
- * and remove "Pricing" from `unconfirmedDetails`.
+ * The tree varieties, sizes, stock, stands, delivery details and prices below
+ * are realistic samples for the owner to review. While `status` is "sample",
+ * the site labels them "Sample". Once the owner confirms the real catalog,
+ * replace the records, set `status` to "confirmed" (the labels disappear),
+ * and trim `unconfirmedDetails`.
+ */
+export const catalog: { status: CatalogStatus } = { status: "sample" };
+
+export const isSampleCatalog = catalog.status === "sample";
+
+/**
+ * Rules behind every price: tree rates per foot (on each tree), flat stand
+ * prices (on each stand) and the delivery fee below. `heights` is the span of
+ * the price-by-height table; each tree has its own range within it.
  */
 export const pricing: PricingRules & {
-  status: PricingStatus;
   heights: { min: number; max: number; step: number; initial: number };
 } = {
-  status: "sample",
   heights: { min: 4, max: 10, step: 1, initial: 7 },
   roundTo: 5,
   delivery: { baseFee: 25, includedMiles: 5, perMile: 2.5, maxMiles: 25 },
@@ -130,109 +143,119 @@ export const images = {
 
 export type TreeProduct = {
   id: string;
+  /** The variety, e.g. "Douglas fir". */
   name: string;
-  /** Short profile name used in the price list and estimator. */
+  /** Short profile name used in the price table and estimator. */
   shape: string;
+  /** Short merchandising label shown on the photo. */
+  badge: string;
   profile: string;
-  variety: string;
-  sizes: string;
+  description: string;
+  traits: readonly string[];
+  /** Heights offered, in feet. */
+  sizes: HeightRange;
   /** Price per foot of height; see `pricing` and `treePrice`. */
   ratePerFoot: number;
   availability: string;
-  description: string;
   image: SiteImage;
-  filters: { type: "pending"; size: "pending" };
 };
 
-/**
- * Catalog scaffolding only. Replace these records when the owner confirms
- * varieties, measurements, prices, and live availability.
- */
+/** Sample catalog (see `catalog`), ordered from best value to premium. */
 export const treeProducts: readonly TreeProduct[] = [
   {
-    id: "tree-01",
-    name: "Seasonal tree 01",
-    shape: "Airy",
-    profile: "Airy profile · illustrative",
-    variety: "Variety pending",
-    sizes: "Sizes pending",
-    ratePerFoot: 14,
-    availability: "Call to confirm",
-    description:
-      "A visual placeholder for a more open branch profile. Final variety and product details require owner approval.",
-    image: images.seasonal01,
-    filters: { type: "pending", size: "pending" },
-  },
-  {
-    id: "tree-02",
-    name: "Seasonal tree 02",
+    id: "douglas-fir",
+    name: "Douglas fir",
     shape: "Classic",
-    profile: "Classic profile · illustrative",
-    variety: "Variety pending",
-    sizes: "Sizes pending",
-    ratePerFoot: 18,
-    availability: "Call to confirm",
+    badge: "Best value",
+    profile: "Full, balanced cone",
     description:
-      "A visual placeholder for a classic full shape. Replace this copy with confirmed variety and care information.",
+      "The traditional Christmas tree: a full, balanced cone with soft needles and a sweet, citrusy scent. A great all-rounder for most rooms.",
+    traits: ["Sweet citrus scent", "Soft needles", "Full, even shape"],
+    sizes: { min: 4, max: 10 },
+    ratePerFoot: 14,
+    availability: "In stock",
     image: images.seasonal02,
-    filters: { type: "pending", size: "pending" },
   },
   {
-    id: "tree-03",
-    name: "Seasonal tree 03",
-    shape: "Dense",
-    profile: "Dense profile · illustrative",
-    variety: "Variety pending",
-    sizes: "Sizes pending",
-    ratePerFoot: 24,
-    availability: "Call to confirm",
+    id: "noble-fir",
+    name: "Noble fir",
+    shape: "Airy",
+    badge: "Ornament favorite",
+    profile: "Open, tiered branches",
     description:
-      "A visual placeholder for a dense branch profile. Current stock and dimensions are not yet published.",
+      "Layered branches with space between them, strong enough for heavy ornaments and long strands of lights. Blue-green needles that last well indoors.",
+    traits: ["Sturdy branches", "Room for ornaments", "Long-lasting needles"],
+    sizes: { min: 5, max: 9 },
+    ratePerFoot: 20,
+    availability: "In stock",
+    image: images.seasonal01,
+  },
+  {
+    id: "fraser-fir",
+    name: "Fraser fir",
+    shape: "Dense",
+    badge: "Premium",
+    profile: "Lush, dense and full",
+    description:
+      "A rich, full tree with dark blue-green needles and silvery undersides. One of the best firs for holding its needles all season.",
+    traits: ["Excellent needle retention", "Dense and full", "Blue-green color"],
+    sizes: { min: 6, max: 8 },
+    ratePerFoot: 24,
+    availability: "Limited",
     image: images.seasonal03,
-    filters: { type: "pending", size: "pending" },
   },
 ];
 
-/** Type and size filter options. Price options are built from each tree's rate. */
-export const treeFilters = {
-  type: [{ value: "pending", label: "Variety to be confirmed" }],
-  size: [{ value: "pending", label: "Size to be confirmed" }],
-} as const;
+/** Size filter bands; a tree matches a band when its height range overlaps it. */
+export const sizeBands = [
+  { value: "4-5", label: "4–5 ft", min: 4, max: 5 },
+  { value: "6-8", label: "6–8 ft", min: 6, max: 8 },
+  { value: "9-10", label: "9–10 ft", min: 9, max: 10 },
+] as const;
 
 export const standProducts = [
   {
     id: "wooden",
     name: "Wooden stand",
     index: "01",
-    description: "Natural cross-brace style listing prepared for confirmed product details.",
-    compatibility: "Compatibility pending",
+    description:
+      "A natural pine cross-brace with a steel cup and a small water dish. Simple and sturdy for smaller trees.",
+    maxTreeHeight: 7,
+    water: "0.5 gal",
     price: 30,
-    availability: "Inventory pending",
+    availability: "In stock",
   },
   {
     id: "metal",
     name: "Metal stand",
     index: "02",
-    description: "Powder-coated frame style listing prepared for confirmed product details.",
-    compatibility: "Compatibility pending",
+    description:
+      "Powder-coated steel legs with four tightening screws. Holds a mid-size tree firmly upright.",
+    maxTreeHeight: 9,
+    water: "1 gal",
     price: 45,
-    availability: "Inventory pending",
+    availability: "In stock",
   },
   {
     id: "bowl",
     name: "Bowl-style stand",
     index: "03",
-    description: "Reservoir-style listing prepared for confirmed capacity and care details.",
-    compatibility: "Compatibility pending",
+    description:
+      "A wide reservoir bowl on a low, stable base. Keeps big trees watered for longer between top-ups.",
+    maxTreeHeight: 10,
+    water: "1.5 gal",
     price: 55,
-    availability: "Inventory pending",
+    availability: "Limited",
   },
 ] as const;
 
-/** Delivery fees come from `pricing.delivery`; these are the parts still pending. */
+/** Delivery fees come from `pricing.delivery`. */
 export const deliveryDetails = [
-  { label: "Availability", value: "Pending confirmation" },
-  { label: "Service areas", value: "Pending confirmation" },
+  { label: "Delivery days", value: "Daily during the season" },
+  {
+    label: "Service area",
+    value: "Glendale, Burbank, Los Feliz, Silver Lake, Eagle Rock and nearby",
+  },
 ] as const;
 
 export const galleryImages: readonly (SiteImage & { title: string; category: string })[] = [
@@ -305,19 +328,28 @@ export const tips = [
   },
 ] as const;
 
+// Spoken caveat for answers built from the sample catalog; empty once confirmed.
+const sampleCaveat = isSampleCatalog
+  ? ` These are sample details until ${business.owner} confirms this season’s catalog, so please call before relying on them.`
+  : "";
+
+// No prices in these answers: they are also published as FAQ structured data.
 export const faqs = [
   {
     question: "When does the lot open for the season?",
-    answer: `Season dates and opening hours have not yet been confirmed here. Call ${business.owner} at ${business.phone.display} for the latest details before making the trip.`,
+    answer: `The proposed season runs ${proposedHours.season}, open ${proposedHours.daily.toLowerCase()}. These dates and hours are still awaiting the owner’s confirmation, so call ${business.owner} at ${business.phone.display} before making the trip.`,
   },
   {
     question: "Where is the Christmas tree lot?",
-    answer: `Please call ${business.owner} for the current lot address and directions. We’ll add a verified location here once confirmed.`,
+    answer: `The proposed location is ${proposedLocation.address}, pending the owner’s confirmation. Call ${business.owner} to confirm the address and get directions before you visit.`,
   },
   {
     question: "What tree sizes and varieties are available?",
-    answer:
-      "Selection and pricing depend on current stock. Call with your preferred height and shape to ask what is available. The tree planner above can help you prepare.",
+    answer: `The catalog offers ${treeProducts
+      .map((tree) => `${tree.name} (${formatHeightRange(tree.sizes)})`)
+      .join(
+        ", ",
+      )}. Stock changes daily, so call with your preferred height to check what is on the lot. The tree planner can help you work out the right height.${sampleCaveat}`,
   },
   {
     question: "Do you sell holiday decorations?",
@@ -325,18 +357,16 @@ export const faqs = [
   },
   {
     question: "Are tree stands available?",
-    answer: `The catalog is prepared for wooden, metal, and bowl-style stands, but this season’s products, compatibility, prices, and availability are not yet confirmed. Call ${business.owner} before relying on a specific option.`,
+    answer: `Yes: ${standProducts
+      .map((stand) => `a ${stand.name.toLowerCase()} for trees up to ${stand.maxTreeHeight} ft`)
+      .join(", ")}. Pick a stand rated for your tree’s height.${sampleCaveat}`,
   },
   {
     question: "How are prices worked out?",
-    // No figures here: this answer is also published as FAQ structured data.
-    answer:
-      pricing.status === "sample"
-        ? `Trees are priced by height, at a rate per foot for each tree profile. Stands have one flat price each, and delivery is a base fee plus a charge for each extra mile. The rates on this website are samples until ${business.owner} confirms this season’s prices, so please call before relying on them.`
-        : `Trees are priced by height, at a rate per foot for each tree profile. Stands have one flat price each, and delivery is a base fee plus a charge for each extra mile. Use the price estimator for a quick total; ${business.owner} confirms the final price.`,
+    answer: `Trees are priced by height, at a rate per foot for each variety. Stands have one flat price each, and delivery is a base fee plus a charge for each extra mile. The price estimator adds it all up line by line.${sampleCaveat}`,
   },
   {
     question: "Can I reserve a tree or arrange delivery?",
-    answer: `Reservations, delivery areas, charges, mileage rules, and other services are not confirmed on this website. Please call ${business.owner} to discuss your needs before making plans.`,
+    answer: `Delivery is planned daily during the season, priced by distance from the lot. Online reservations aren’t available, so call ${business.owner} to ask about holding a tree.${sampleCaveat}`,
   },
 ] as const;

@@ -1,24 +1,55 @@
 "use client";
 
-import type { FormEvent } from "react";
+import { useEffect, useRef, type ComponentProps, type FormEvent } from "react";
 
-import { business } from "@/content/site";
+import { business, treeProducts } from "@/content/site";
 import { smsHref } from "@/lib/sms";
 
+import { ButtonLink } from "../ui/button-link";
 import { Message } from "../ui/icons";
 
+const INTEREST_EVENT = "inquiry:interest";
+
+/** Pre-selects the form's "I'm interested in" option, e.g. from a catalog card. */
+export function prefillInquiry(interest: string) {
+  window.dispatchEvent(new CustomEvent<string>(INTEREST_EVENT, { detail: interest }));
+}
+
+/** Jumps to the inquiry form with `interest` already selected. */
+export function InquiryButton({
+  interest,
+  ...props
+}: { interest: string } & Omit<ComponentProps<typeof ButtonLink>, "href" | "onClick">) {
+  return <ButtonLink href="#inquiry" onClick={() => prefillInquiry(interest)} {...props} />;
+}
+
 export function InquiryForm() {
+  const interestRef = useRef<HTMLSelectElement>(null);
+
+  useEffect(() => {
+    const select = (event: Event) => {
+      const interest = (event as CustomEvent<string>).detail;
+      const field = interestRef.current;
+      if (field && [...field.options].some((option) => option.value === interest)) {
+        field.value = interest;
+      }
+    };
+    window.addEventListener(INTEREST_EVENT, select);
+    return () => window.removeEventListener(INTEREST_EVENT, select);
+  }, []);
+
   const submitInquiry = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
 
-    const data = new FormData(form);
+    // Empty fields come back as "", so fall back with || rather than ??.
+    const field = (name: string) => String(new FormData(form).get(name) ?? "").trim();
     const lines = [
-      `Hi ${business.owner}, I’m ${String(data.get("name") ?? "")}.`,
-      `I’m asking about: ${String(data.get("interest") ?? "")}.`,
-      `Preferred height: ${String(data.get("height") ?? "Not sure yet")}.`,
-      String(data.get("message") ?? ""),
+      `Hi ${business.owner}, I’m ${field("name")}.`,
+      `I’m asking about: ${field("interest")}.`,
+      `Preferred height: ${field("height") || "Not sure yet"}.`,
+      field("message"),
     ];
     window.location.href = smsHref(business.phone.e164, lines.join("\n"));
   };
@@ -52,11 +83,16 @@ export function InquiryForm() {
         </label>
         <label className="grid gap-1 text-xs text-paper/70">
           I’m interested in
-          <select name="interest" required className={fieldClass} defaultValue="">
+          <select ref={interestRef} name="interest" required className={fieldClass} defaultValue="">
             <option value="" disabled className="text-ink">
               Choose one
             </option>
-            <option className="text-ink">A Christmas tree</option>
+            {treeProducts.map((tree) => (
+              <option key={tree.id} className="text-ink">
+                {tree.name}
+              </option>
+            ))}
+            <option className="text-ink">A Christmas tree (help me choose)</option>
             <option className="text-ink">A tree stand</option>
             <option className="text-ink">Delivery information</option>
             <option className="text-ink">Visit details</option>

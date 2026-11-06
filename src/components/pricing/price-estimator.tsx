@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { business, pricing, standProducts, treeProducts } from "@/content/site";
+import { business, isSampleCatalog, pricing, standProducts, treeProducts } from "@/content/site";
+import { clampHeight, formatHeightRange } from "@/lib/catalog";
+import { cn } from "@/lib/cn";
 import { buildEstimate, formatPrice, type DeliveryQuote } from "@/lib/pricing";
 import { smsHref } from "@/lib/sms";
 
@@ -15,7 +17,7 @@ const { delivery } = pricing;
 // The slider runs past the delivery limit so visitors can see what happens beyond it.
 const mileLimits = { min: 1, max: delivery.maxMiles + 5, step: 1 };
 
-type Line = { id: string; label: string; detail: string; amount: string };
+type Line = { id: string; label: string; detail: string; amount: string; warning?: boolean };
 
 function deliveryLine(quote: DeliveryQuote): Line {
   switch (quote.kind) {
@@ -56,6 +58,7 @@ export function PriceEstimator() {
 
   const tree = treeProducts.find((product) => product.id === treeId) ?? treeProducts[0];
   const stand = standProducts.find((product) => product.id === standId) ?? null;
+  const standTooSmall = stand !== null && height > stand.maxTreeHeight;
   const estimate = buildEstimate(
     {
       heightFeet: height,
@@ -69,24 +72,37 @@ export function PriceEstimator() {
   const lines: Line[] = [
     {
       id: "tree",
-      label: `${tree.shape} tree, ${height} ft`,
+      label: `${tree.name}, ${height} ft`,
       detail: `${height} ft × ${formatPrice(tree.ratePerFoot)} per ft, rounded to the nearest ${formatPrice(pricing.roundTo)}`,
       amount: formatPrice(estimate.tree),
     },
     stand
-      ? { id: "stand", label: stand.name, detail: "Flat price", amount: formatPrice(stand.price) }
+      ? {
+          id: "stand",
+          label: stand.name,
+          detail: standTooSmall
+            ? `Too small for a ${height} ft tree: fits up to ${stand.maxTreeHeight} ft`
+            : `Flat price · fits trees up to ${stand.maxTreeHeight} ft`,
+          amount: formatPrice(stand.price),
+          warning: standTooSmall,
+        }
       : { id: "stand", label: "No stand", detail: "Bring your own", amount: "$0" },
     deliveryLine(estimate.delivery),
   ];
 
   const total = formatPrice(estimate.total);
   const outOfArea = estimate.delivery.kind === "out-of-area";
-  const isSample = pricing.status === "sample";
+  const isSample = isSampleCatalog;
   const deliveryNote = outOfArea ? ", plus delivery arranged by phone" : "";
-  const summary = `Estimated total ${total}${deliveryNote}.`;
+  const standWarning = standTooSmall
+    ? ` The ${stand.name.toLowerCase()} is too small for this tree.`
+    : "";
+  const summary = `Estimated total ${total}${deliveryNote}.${standWarning}`;
   const message = [
     `Hi ${business.owner}, I used the price estimator on your website:`,
-    ...lines.map((line) => `- ${line.label}: ${line.amount}`),
+    ...lines.map(
+      (line) => `- ${line.label}: ${line.amount}${line.warning ? ` (${line.detail})` : ""}`,
+    ),
     `Estimated total: ${total}${deliveryNote}${isSample ? " (sample pricing)" : ""}.`,
     "Could you confirm the price and availability?",
   ].join("\n");
@@ -104,6 +120,13 @@ export function PriceEstimator() {
       setter(value);
     };
 
+  // Each variety comes in its own height range, so keep the height inside it.
+  const selectTree = (id: string) => {
+    const next = treeProducts.find((product) => product.id === id) ?? tree;
+    interact(setTreeId)(next.id);
+    setHeight((current) => clampHeight(current, next.sizes));
+  };
+
   return (
     <div className="grid overflow-hidden border border-line bg-paper lg:grid-cols-2">
       <form
@@ -112,7 +135,7 @@ export function PriceEstimator() {
         onSubmit={(event) => event.preventDefault()}
       >
         <fieldset>
-          <legend className="mb-3 text-sm font-medium">Tree profile</legend>
+          <legend className="mb-3 text-sm font-medium">Tree variety</legend>
           <div className="grid gap-2 sm:grid-cols-3">
             {treeProducts.map((product) => (
               <Choice
@@ -121,9 +144,14 @@ export function PriceEstimator() {
                 name="estimate-tree"
                 value={product.id}
                 checked={treeId === product.id}
-                onChange={() => interact(setTreeId)(product.id)}
+                onChange={() => selectTree(product.id)}
               >
-                {product.shape} · {formatPrice(product.ratePerFoot)}/ft
+                <span className="text-center">
+                  {product.name}
+                  <span className="block text-[0.6875rem] opacity-75">
+                    {formatPrice(product.ratePerFoot)} per ft
+                  </span>
+                </span>
               </Choice>
             ))}
           </div>
@@ -131,11 +159,11 @@ export function PriceEstimator() {
 
         <RangeField
           label="Tree height"
-          hint="Priced per foot"
+          hint={`${tree.name} comes in ${formatHeightRange(tree.sizes)}`}
           value={height}
           display={`${height} ft`}
           valueText={`${height} feet`}
-          limits={pricing.heights}
+          limits={{ ...tree.sizes, step: pricing.heights.step }}
           onChange={interact(setHeight)}
         />
 
@@ -160,7 +188,12 @@ export function PriceEstimator() {
                 checked={standId === product.id}
                 onChange={() => interact(setStandId)(product.id)}
               >
-                {product.name} · {formatPrice(product.price)}
+                <span className="text-center">
+                  {product.name} · {formatPrice(product.price)}
+                  <span className="block text-[0.6875rem] opacity-75">
+                    Fits trees up to {product.maxTreeHeight} ft
+                  </span>
+                </span>
               </Choice>
             ))}
           </div>
@@ -214,7 +247,14 @@ export function PriceEstimator() {
             <div key={line.id} className="flex items-start justify-between gap-6 py-4">
               <dt>
                 <span className="block text-sm font-medium">{line.label}</span>
-                <span className="mt-1 block text-xs leading-relaxed text-moss">{line.detail}</span>
+                <span
+                  className={cn(
+                    "mt-1 block text-xs leading-relaxed",
+                    line.warning ? "font-medium text-berry" : "text-moss",
+                  )}
+                >
+                  {line.detail}
+                </span>
               </dt>
               <dd className="shrink-0 text-sm font-medium tabular-nums">{line.amount}</dd>
             </div>

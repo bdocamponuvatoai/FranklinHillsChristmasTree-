@@ -37,13 +37,18 @@ Season dates, hours, address, pricing, varieties, stand inventory, reservations 
 never present them as business facts or infer them from the imagery. Once confirmed, remove the
 item from `unconfirmedDetails`, update the matching catalog or service record, and revise the FAQ.
 
+**The catalog is sample content** for the owner to review: tree varieties (with height ranges),
+stands (with the tallest tree each fits), delivery details and prices. While
+`catalog.status` is `"sample"`, the site labels all of it "Sample" and shows a sample notice in
+the catalog and pricing sections. When the owner confirms the real catalog, replace the records,
+set the status to `"confirmed"` (the labels and notices disappear) and trim `unconfirmedDetails`.
+The season and hours (`proposedHours`) and address (`proposedLocation`) are shown as proposed.
+
 **Pricing** follows three rules, all set in `src/content/site.ts`: trees cost height × a rate per
 foot (`ratePerFoot` on each tree), rounded to the nearest $5; stands have a flat `price`; delivery
 is a base fee plus a charge per extra mile (`pricing.delivery`). The catalog, stands, delivery
-section, price table and estimator all calculate from these numbers via `src/lib/pricing.ts`. The
-current rates are **samples** for the owner to review (`pricing.status: "sample"`), so every price
-carries a "Sample" label. When the owner confirms real rates, replace the numbers, set the status
-to `"confirmed"` (the labels disappear) and remove "Pricing" from `unconfirmedDetails`.
+section, price table and estimator all calculate from these numbers via `src/lib/pricing.ts`, and
+the catalog filters and estimator use each tree's height range via `src/lib/catalog.ts`.
 
 Imagery in `src/assets/images` is AI-generated seasonal inspiration and product scaffolding, not
 photos of the lot, inventory, customers, or delivery fleet. The disclaimer is shown on the site;
@@ -77,7 +82,7 @@ src/
     pricing/           Price estimator and the "Sample" price label
     ui/                Buttons, links, icons, brand mark
   content/site.ts      Single source of truth for copy and business facts
-  lib/                 Planner and pricing maths (unit tested), site config, helpers
+  lib/                 Planner, pricing and catalog maths (unit tested), site config, helpers
 ```
 
 ## Design and engineering notes

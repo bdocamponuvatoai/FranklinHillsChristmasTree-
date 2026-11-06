@@ -24,8 +24,8 @@ export function TreeStands() {
             </h2>
           </div>
           <p className="max-w-md text-[0.9375rem] leading-relaxed text-paper/70 lg:col-span-4 lg:col-start-9">
-            Compare the three stand categories the catalog is prepared to support. Products,
-            compatibility, and availability are not yet confirmed.
+            Three ways to hold your tree steady and watered. Each stand is rated for a maximum tree
+            height, so pick the one that fits.
           </p>
         </div>
 
@@ -42,7 +42,7 @@ export function TreeStands() {
               className="object-cover"
             />
             <p className="absolute right-4 bottom-4 left-4 bg-pine-deep/85 px-4 py-3 text-xs leading-relaxed text-paper/75 backdrop-blur-md">
-              Illustrative product styling — not confirmed inventory.
+              Illustrative product styling, not photos of actual stock.
             </p>
           </div>
 
@@ -56,25 +56,27 @@ export function TreeStands() {
                     </p>
                     <h3 className="mt-3 font-display text-3xl tracking-[-0.03em]">{stand.name}</h3>
                   </div>
-                  <span className="size-2 shrink-0 rounded-full bg-glow" aria-hidden="true" />
+                  <p className="shrink-0 pt-1 text-right font-display text-2xl tracking-[-0.02em] tabular-nums">
+                    {formatPrice(stand.price)}
+                    <span className="mt-1 block font-sans text-base">
+                      <SampleTag />
+                    </span>
+                  </p>
                 </div>
                 <p className="mt-4 max-w-md text-sm leading-relaxed text-paper/65">
                   {stand.description}
                 </p>
-                <dl className="mt-5 grid gap-2 text-xs sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                <dl className="mt-5 grid grid-cols-3 gap-2 text-xs">
                   <div>
-                    <dt className="text-paper/65">Fit</dt>
-                    <dd className="mt-1">{stand.compatibility}</dd>
+                    <dt className="text-paper/65">Fits trees</dt>
+                    <dd className="mt-1">Up to {stand.maxTreeHeight} ft</dd>
                   </div>
                   <div>
-                    <dt className="text-paper/65">Price</dt>
-                    <dd className="mt-1">
-                      {formatPrice(stand.price)}
-                      <SampleTag />
-                    </dd>
+                    <dt className="text-paper/65">Water</dt>
+                    <dd className="mt-1">Holds {stand.water}</dd>
                   </div>
                   <div>
-                    <dt className="text-paper/65">Status</dt>
+                    <dt className="text-paper/65">Stock</dt>
                     <dd className="mt-1">{stand.availability}</dd>
                   </div>
                 </dl>
@@ -85,8 +87,8 @@ export function TreeStands() {
 
         <div className="mt-8 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
           <p className="max-w-xl text-sm leading-relaxed text-paper/65">
-            Bring your tree measurements when you ask about fit. {business.owner} can confirm what
-            stand options are actually available.
+            Not sure which stand fits? The price estimator flags a stand that’s too small for your
+            tree, or {business.owner} can help by phone.
           </p>
           <ButtonLink href={business.phone.href} variant="ivory" icon={<Phone />}>
             Ask about stands
