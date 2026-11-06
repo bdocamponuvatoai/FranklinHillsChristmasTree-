@@ -1,4 +1,4 @@
-import { business, proposedLocation, unconfirmedDetails } from "@/content/site";
+import { business, proposedHours, proposedLocation, unconfirmedDetails } from "@/content/site";
 
 import { ButtonLink } from "../ui/button-link";
 import { Eyebrow } from "../ui/eyebrow";
@@ -16,8 +16,8 @@ export function Visit() {
           </h2>
         </div>
         <p className="max-w-sm text-[0.9375rem] leading-relaxed text-moss md:col-span-4 md:justify-self-end">
-          Call or send a text inquiry before making the trip. The address, operating hours, and
-          season dates are still awaiting owner confirmation.
+          Call or send a text inquiry before making the trip. The address, hours, and season dates
+          below are proposed and still awaiting the owner’s confirmation.
         </p>
       </div>
 
@@ -76,12 +76,21 @@ export function Visit() {
             <div className="flex items-center justify-between gap-4">
               <h3 className="font-display text-2xl">Hours &amp; season</h3>
               <span className="rounded-full bg-sage px-3 py-1.5 text-[0.625rem] font-medium tracking-[0.1em] text-berry uppercase">
-                Pending
+                Proposed
               </span>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-moss">
-              Opening dates and daily hours have not been approved for publication. Call before
-              visiting.
+            <dl className="mt-5 divide-y divide-line border-y border-line text-sm">
+              <div className="flex justify-between gap-4 py-3">
+                <dt className="text-moss">Season</dt>
+                <dd className="text-right font-medium">{proposedHours.season}</dd>
+              </div>
+              <div className="flex justify-between gap-4 py-3">
+                <dt className="text-moss">Hours</dt>
+                <dd className="text-right font-medium">{proposedHours.daily}</dd>
+              </div>
+            </dl>
+            <p className="mt-4 text-xs leading-relaxed text-moss">
+              {proposedHours.status}. Call before visiting.
             </p>
           </div>
         </div>

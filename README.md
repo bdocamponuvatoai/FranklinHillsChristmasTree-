@@ -37,6 +37,19 @@ Season dates, hours, address, pricing, varieties, stand inventory, reservations 
 never present them as business facts or infer them from the imagery. Once confirmed, remove the
 item from `unconfirmedDetails`, update the matching catalog or service record, and revise the FAQ.
 
+**The catalog is sample content** for the owner to review: tree varieties (with height ranges),
+stands (with the tallest tree each fits), delivery details and prices. While
+`catalog.status` is `"sample"`, the site labels all of it "Sample" and shows a sample notice in
+the catalog and pricing sections. When the owner confirms the real catalog, replace the records,
+set the status to `"confirmed"` (the labels and notices disappear) and trim `unconfirmedDetails`.
+The season and hours (`proposedHours`) and address (`proposedLocation`) are shown as proposed.
+
+**Pricing** follows three rules, all set in `src/content/site.ts`: trees cost height × a rate per
+foot (`ratePerFoot` on each tree), rounded to the nearest $5; stands have a flat `price`; delivery
+is a base fee plus a charge per extra mile (`pricing.delivery`). The catalog, stands, delivery
+section, price table and estimator all calculate from these numbers via `src/lib/pricing.ts`, and
+the catalog filters and estimator use each tree's height range via `src/lib/catalog.ts`.
+
 Imagery in `src/assets/images` is AI-generated seasonal inspiration and product scaffolding, not
 photos of the lot, inventory, customers, or delivery fleet. The disclaimer is shown on the site;
 keep it while those images are in use. The prompts are in
@@ -66,16 +79,17 @@ src/
     layout/            Announcement bar, header, scroll-spy nav, mobile menu, mobile dock, footer
     sections/          One file per homepage section
     planner/           Interactive tree-height planner and its SVG illustration
+    pricing/           Price estimator and the "Sample" price label
     ui/                Buttons, links, icons, brand mark
   content/site.ts      Single source of truth for copy and business facts
-  lib/                 Planner maths (unit tested), site config, helpers
+  lib/                 Planner, pricing and catalog maths (unit tested), site config, helpers
 ```
 
 ## Design and engineering notes
 
 - **Server Components by default.** Only the interactive pieces are client components: the scene
-  showcase, tree planner, tree catalog filters, gallery lightbox, inquiry form, mobile menu,
-  scroll-spy nav and mobile dock.
+  showcase, tree planner, price estimator, tree catalog filters, gallery lightbox, inquiry form,
+  mobile menu, scroll-spy nav and mobile dock.
 - **No animation library.** Entrances, parallax, word-by-word ink fill, reading progress and the
   scene autoplay timer all use CSS (including scroll-driven animations). Everything is visible when
   a browser lacks support, and nothing moves for visitors who prefer reduced motion.

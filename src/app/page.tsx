@@ -8,6 +8,7 @@ import { Interlude } from "@/components/sections/interlude";
 import { Marquee } from "@/components/sections/marquee";
 import { Moments } from "@/components/sections/moments";
 import { PlannerSection } from "@/components/sections/planner-section";
+import { PricingSection } from "@/components/sections/pricing-section";
 import { Statement } from "@/components/sections/statement";
 import { Tradition } from "@/components/sections/tradition";
 import { TreeCatalog } from "@/components/sections/tree-catalog";
@@ -58,6 +59,7 @@ export default function HomePage() {
       <TreeCatalog />
       <TreeStands />
       <Delivery />
+      <PricingSection />
       <Gallery />
       <Moments />
       <Statement />

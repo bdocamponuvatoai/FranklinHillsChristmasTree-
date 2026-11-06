@@ -27,7 +27,9 @@ export function Decorations() {
         </div>
 
         <div className="p-2 pt-0 sm:p-3 sm:pt-0 lg:col-span-7 lg:pt-3 lg:pl-0">
-          <div className="unveil relative aspect-[4/3] h-full overflow-hidden rounded-[1rem] sm:rounded-[1.5rem] lg:min-h-[36rem]">
+          {/* lg:aspect-auto: with a 4:3 ratio, the 36rem minimum height would force a 768px
+              width and overflow the column on screens narrower than ~1300px. */}
+          <div className="unveil relative aspect-[4/3] h-full overflow-hidden rounded-[1rem] sm:rounded-[1.5rem] lg:aspect-auto lg:min-h-[36rem]">
             <Image
               src={images.detail.src}
               alt={images.detail.alt}
