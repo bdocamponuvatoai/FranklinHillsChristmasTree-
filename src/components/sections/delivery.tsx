@@ -1,10 +1,23 @@
 import Image from "next/image";
 
-import { business, deliveryDetails, images } from "@/content/site";
+import { business, deliveryDetails, images, pricing } from "@/content/site";
+import { formatPrice } from "@/lib/pricing";
 
+import { SampleTag } from "../pricing/sample-tag";
 import { ButtonLink } from "../ui/button-link";
 import { Eyebrow } from "../ui/eyebrow";
 import { Phone } from "../ui/icons";
+import { TextLink } from "../ui/text-link";
+
+const { baseFee, includedMiles, perMile, maxMiles } = pricing.delivery;
+
+const feeDetails = [
+  {
+    label: "Delivery charge",
+    value: `${formatPrice(baseFee)} for the first ${includedMiles} miles`,
+  },
+  { label: "Extra miles", value: `${formatPrice(perMile)} per mile, up to ${maxMiles} miles` },
+];
 
 export function Delivery() {
   return (
@@ -20,8 +33,8 @@ export function Delivery() {
             Delivery details, <em className="text-berry">clearly stated.</em>
           </h2>
           <p className="mt-7 max-w-md text-[0.9375rem] leading-relaxed text-moss">
-            Delivery has not been confirmed for this season. The structure below is ready for the
-            owner’s service areas and fees as soon as they are approved.
+            Delivery has not been confirmed for this season. The fees below show how delivery
+            pricing works: a base fee, then a charge for each extra mile.
           </p>
 
           <dl className="mt-9 border-t border-line">
@@ -34,6 +47,18 @@ export function Delivery() {
                 <dd className="text-right font-medium">{detail.value}</dd>
               </div>
             ))}
+            {feeDetails.map((detail) => (
+              <div
+                key={detail.label}
+                className="grid grid-cols-2 gap-5 border-b border-line py-4 text-sm"
+              >
+                <dt className="text-moss">{detail.label}</dt>
+                <dd className="text-right font-medium">
+                  {detail.value}
+                  <SampleTag />
+                </dd>
+              </div>
+            ))}
           </dl>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -44,10 +69,9 @@ export function Delivery() {
               Call {business.owner}
             </ButtonLink>
           </div>
-          <p className="mt-5 text-xs leading-relaxed text-moss">
-            No automatic mileage quote is provided because the pricing rules have not been
-            confirmed.
-          </p>
+          <TextLink href="#pricing" className="mt-3 text-pine">
+            Work out a delivery fee in the price estimator
+          </TextLink>
         </div>
 
         <figure className="lg:col-span-6 lg:col-start-7">

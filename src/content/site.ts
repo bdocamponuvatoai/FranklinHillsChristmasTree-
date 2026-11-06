@@ -7,6 +7,8 @@
  */
 import type { StaticImageData } from "next/image";
 
+import type { PricingRules } from "@/lib/pricing";
+
 import deliveryImage from "@/assets/images/delivery.webp";
 import detailImage from "@/assets/images/detail.webp";
 import heroImage from "@/assets/images/hero.webp";
@@ -51,6 +53,27 @@ export const proposedLocation = {
     "https://www.google.com/maps/search/?api=1&query=1256%20S%20Glendale%20Ave%2C%20Glendale%2C%20CA%2091205",
 } as const;
 
+export type PricingStatus = "sample" | "confirmed";
+
+/**
+ * Rules behind every price on the site: tree rates per foot (on each tree
+ * product), flat stand prices (on each stand) and the delivery fee below.
+ *
+ * While `status` is "sample", every price carries a "Sample" label: these rates
+ * show the owner how pricing works and are not this season's prices. Once the
+ * owner confirms real rates, update the numbers, set `status` to "confirmed",
+ * and remove "Pricing" from `unconfirmedDetails`.
+ */
+export const pricing: PricingRules & {
+  status: PricingStatus;
+  heights: { min: number; max: number; step: number; initial: number };
+} = {
+  status: "sample",
+  heights: { min: 4, max: 10, step: 1, initial: 7 },
+  roundTo: 5,
+  delivery: { baseFee: 25, includedMiles: 5, perMile: 2.5, maxMiles: 25 },
+};
+
 export const imageDisclaimer =
   "Imagery is AI-created seasonal inspiration — not photos of the actual lot or current stock.";
 
@@ -59,8 +82,9 @@ export type NavItem = { href: `#${string}`; label: string; index: string };
 export const navigation: readonly NavItem[] = [
   { href: "#trees", label: "Trees", index: "01" },
   { href: "#stands", label: "Stands & delivery", index: "02" },
-  { href: "#gallery", label: "Gallery", index: "03" },
-  { href: "#visit", label: "Visit", index: "04" },
+  { href: "#pricing", label: "Pricing", index: "03" },
+  { href: "#gallery", label: "Gallery", index: "04" },
+  { href: "#visit", label: "Visit", index: "05" },
 ];
 
 export type SiteImage = { src: StaticImageData; alt: string };
@@ -107,14 +131,17 @@ export const images = {
 export type TreeProduct = {
   id: string;
   name: string;
+  /** Short profile name used in the price list and estimator. */
+  shape: string;
   profile: string;
   variety: string;
   sizes: string;
-  price: string;
+  /** Price per foot of height; see `pricing` and `treePrice`. */
+  ratePerFoot: number;
   availability: string;
   description: string;
   image: SiteImage;
-  filters: { type: "pending"; size: "pending"; price: "pending" };
+  filters: { type: "pending"; size: "pending" };
 };
 
 /**
@@ -125,48 +152,51 @@ export const treeProducts: readonly TreeProduct[] = [
   {
     id: "tree-01",
     name: "Seasonal tree 01",
+    shape: "Airy",
     profile: "Airy profile · illustrative",
     variety: "Variety pending",
     sizes: "Sizes pending",
-    price: "Price pending",
+    ratePerFoot: 14,
     availability: "Call to confirm",
     description:
       "A visual placeholder for a more open branch profile. Final variety and product details require owner approval.",
     image: images.seasonal01,
-    filters: { type: "pending", size: "pending", price: "pending" },
+    filters: { type: "pending", size: "pending" },
   },
   {
     id: "tree-02",
     name: "Seasonal tree 02",
+    shape: "Classic",
     profile: "Classic profile · illustrative",
     variety: "Variety pending",
     sizes: "Sizes pending",
-    price: "Price pending",
+    ratePerFoot: 18,
     availability: "Call to confirm",
     description:
       "A visual placeholder for a classic full shape. Replace this copy with confirmed variety and care information.",
     image: images.seasonal02,
-    filters: { type: "pending", size: "pending", price: "pending" },
+    filters: { type: "pending", size: "pending" },
   },
   {
     id: "tree-03",
     name: "Seasonal tree 03",
+    shape: "Dense",
     profile: "Dense profile · illustrative",
     variety: "Variety pending",
     sizes: "Sizes pending",
-    price: "Price pending",
+    ratePerFoot: 24,
     availability: "Call to confirm",
     description:
-      "A visual placeholder for a dense branch profile. Current stock, dimensions, and pricing are not yet published.",
+      "A visual placeholder for a dense branch profile. Current stock and dimensions are not yet published.",
     image: images.seasonal03,
-    filters: { type: "pending", size: "pending", price: "pending" },
+    filters: { type: "pending", size: "pending" },
   },
 ];
 
+/** Type and size filter options. Price options are built from each tree's rate. */
 export const treeFilters = {
   type: [{ value: "pending", label: "Variety to be confirmed" }],
   size: [{ value: "pending", label: "Size to be confirmed" }],
-  price: [{ value: "pending", label: "Price to be confirmed" }],
 } as const;
 
 export const standProducts = [
@@ -176,7 +206,7 @@ export const standProducts = [
     index: "01",
     description: "Natural cross-brace style listing prepared for confirmed product details.",
     compatibility: "Compatibility pending",
-    price: "Price pending",
+    price: 30,
     availability: "Inventory pending",
   },
   {
@@ -185,7 +215,7 @@ export const standProducts = [
     index: "02",
     description: "Powder-coated frame style listing prepared for confirmed product details.",
     compatibility: "Compatibility pending",
-    price: "Price pending",
+    price: 45,
     availability: "Inventory pending",
   },
   {
@@ -194,16 +224,15 @@ export const standProducts = [
     index: "03",
     description: "Reservoir-style listing prepared for confirmed capacity and care details.",
     compatibility: "Compatibility pending",
-    price: "Price pending",
+    price: 55,
     availability: "Inventory pending",
   },
 ] as const;
 
+/** Delivery fees come from `pricing.delivery`; these are the parts still pending. */
 export const deliveryDetails = [
   { label: "Availability", value: "Pending confirmation" },
   { label: "Service areas", value: "Pending confirmation" },
-  { label: "Delivery charge", value: "Pending confirmation" },
-  { label: "Mileage fees", value: "No calculation published" },
 ] as const;
 
 export const galleryImages: readonly (SiteImage & { title: string; category: string })[] = [
@@ -297,6 +326,14 @@ export const faqs = [
   {
     question: "Are tree stands available?",
     answer: `The catalog is prepared for wooden, metal, and bowl-style stands, but this season’s products, compatibility, prices, and availability are not yet confirmed. Call ${business.owner} before relying on a specific option.`,
+  },
+  {
+    question: "How are prices worked out?",
+    // No figures here: this answer is also published as FAQ structured data.
+    answer:
+      pricing.status === "sample"
+        ? `Trees are priced by height, at a rate per foot for each tree profile. Stands have one flat price each, and delivery is a base fee plus a charge for each extra mile. The rates on this website are samples until ${business.owner} confirms this season’s prices, so please call before relying on them.`
+        : `Trees are priced by height, at a rate per foot for each tree profile. Stands have one flat price each, and delivery is a base fee plus a charge for each extra mile. Use the price estimator for a quick total; ${business.owner} confirms the final price.`,
   },
   {
     question: "Can I reserve a tree or arrange delivery?",

@@ -3,13 +3,32 @@
 import Image from "next/image";
 import { useState } from "react";
 
-import { business, treeFilters, treeProducts } from "@/content/site";
+import { business, pricing, treeFilters, treeProducts, type TreeProduct } from "@/content/site";
+import { formatPrice } from "@/lib/pricing";
 
+import { SampleTag } from "../pricing/sample-tag";
 import { ButtonLink } from "../ui/button-link";
 import { Eyebrow } from "../ui/eyebrow";
 import { Phone } from "../ui/icons";
+import { TextLink } from "../ui/text-link";
 
-type FilterName = keyof (typeof treeProducts)[number]["filters"];
+type FilterName = "type" | "size" | "price";
+
+const filterNames: readonly FilterName[] = ["type", "size", "price"];
+
+// Price options are built from the trees' own rates, so they always match the cards.
+const filterOptions: Record<FilterName, readonly { value: string; label: string }[]> = {
+  ...treeFilters,
+  price: [...new Set(treeProducts.map((product) => product.ratePerFoot))]
+    .sort((a, b) => a - b)
+    .map((rate) => ({
+      value: String(rate),
+      label: `${formatPrice(rate)} per ft${pricing.status === "sample" ? " (sample)" : ""}`,
+    })),
+};
+
+const productValue = (product: TreeProduct, name: FilterName) =>
+  name === "price" ? String(product.ratePerFoot) : product.filters[name];
 
 const initialFilters: Record<FilterName, string> = {
   type: "all",
@@ -20,8 +39,8 @@ const initialFilters: Record<FilterName, string> = {
 export function TreeCatalog() {
   const [filters, setFilters] = useState(initialFilters);
   const filteredProducts = treeProducts.filter((product) =>
-    (Object.keys(filters) as FilterName[]).every(
-      (key) => filters[key] === "all" || product.filters[key] === filters[key],
+    filterNames.every(
+      (key) => filters[key] === "all" || productValue(product, key) === filters[key],
     ),
   );
 
@@ -41,14 +60,17 @@ export function TreeCatalog() {
         <div className="md:col-span-4 md:justify-self-end">
           <p className="max-w-sm text-[0.9375rem] leading-relaxed text-moss">
             Browse the catalog framework below, then call for the current selection. Varieties,
-            sizes, prices, and stock are awaiting owner confirmation.
+            sizes, and stock are awaiting owner confirmation.
           </p>
+          <TextLink href="#pricing" className="mt-2 text-pine">
+            See how pricing works
+          </TextLink>
         </div>
       </div>
 
       <div className="mt-12 border-y border-line py-5 sm:mt-16">
         <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-[1fr_1fr_1fr_auto] lg:items-end">
-          {(Object.keys(treeFilters) as FilterName[]).map((name) => (
+          {filterNames.map((name) => (
             <label key={name} className="grid gap-2 text-xs font-medium text-moss">
               <span className="tracking-[0.14em] uppercase">
                 {name === "type" ? "Tree type" : name}
@@ -61,7 +83,7 @@ export function TreeCatalog() {
                 <option value="all">
                   All {name === "type" ? "types" : name === "size" ? "sizes" : "prices"}
                 </option>
-                {treeFilters[name].map((option) => (
+                {filterOptions[name].map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -116,11 +138,19 @@ export function TreeCatalog() {
                 </p>
                 <dl className="mt-6 divide-y divide-line border-y border-line text-sm">
                   {[
-                    ["Variety", product.variety],
-                    ["Available sizes", product.sizes],
-                    ["Price", product.price],
-                    ["Availability", product.availability],
-                  ].map(([label, value]) => (
+                    { label: "Variety", value: product.variety },
+                    { label: "Available sizes", value: product.sizes },
+                    {
+                      label: "Price",
+                      value: (
+                        <>
+                          {formatPrice(product.ratePerFoot)} per ft
+                          <SampleTag />
+                        </>
+                      ),
+                    },
+                    { label: "Availability", value: product.availability },
+                  ].map(({ label, value }) => (
                     <div key={label} className="grid grid-cols-2 gap-4 py-3">
                       <dt className="text-moss">{label}</dt>
                       <dd className="text-right font-medium">{value}</dd>

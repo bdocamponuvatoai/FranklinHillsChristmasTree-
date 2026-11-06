@@ -3,6 +3,7 @@
 import type { FormEvent } from "react";
 
 import { business } from "@/content/site";
+import { smsHref } from "@/lib/sms";
 
 import { Message } from "../ui/icons";
 
@@ -19,7 +20,7 @@ export function InquiryForm() {
       `Preferred height: ${String(data.get("height") ?? "Not sure yet")}.`,
       String(data.get("message") ?? ""),
     ];
-    window.location.href = `sms:${business.phone.e164}?body=${encodeURIComponent(lines.join("\n"))}`;
+    window.location.href = smsHref(business.phone.e164, lines.join("\n"));
   };
 
   const fieldClass =

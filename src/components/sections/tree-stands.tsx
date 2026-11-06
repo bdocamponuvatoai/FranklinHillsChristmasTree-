@@ -1,7 +1,9 @@
 import Image from "next/image";
 
 import { business, images, standProducts } from "@/content/site";
+import { formatPrice } from "@/lib/pricing";
 
+import { SampleTag } from "../pricing/sample-tag";
 import { ButtonLink } from "../ui/button-link";
 import { Eyebrow } from "../ui/eyebrow";
 import { Phone } from "../ui/icons";
@@ -23,7 +25,7 @@ export function TreeStands() {
           </div>
           <p className="max-w-md text-[0.9375rem] leading-relaxed text-paper/70 lg:col-span-4 lg:col-start-9">
             Compare the three stand categories the catalog is prepared to support. Products,
-            compatibility, pricing, and availability are not yet confirmed.
+            compatibility, and availability are not yet confirmed.
           </p>
         </div>
 
@@ -66,7 +68,10 @@ export function TreeStands() {
                   </div>
                   <div>
                     <dt className="text-paper/65">Price</dt>
-                    <dd className="mt-1">{stand.price}</dd>
+                    <dd className="mt-1">
+                      {formatPrice(stand.price)}
+                      <SampleTag />
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-paper/65">Status</dt>
